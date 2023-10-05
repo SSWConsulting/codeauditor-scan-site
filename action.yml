@@ -1,0 +1,121 @@
+name: CodeAuditor Feedback Loop Workflow
+description: This is an action that creates new issues if there is an increase in the number of errors found from CodeAuditor scan
+author: Tom Bui
+branding:
+  icon: 'paperclip'
+  color: 'red'
+
+inputs:
+  token:
+    description: 'Your CodeAuditor token'
+    required: true
+  url:
+    description: 'Your URL'
+    required: true
+  GitHub_Token:
+    description: 'Your GitHub Token'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get input
+      shell: bash
+      run: |
+        inputs=($INPUTS)
+    - name: "SSW CodeAuditor - Check broken links and performance"
+      shell: bash
+      continue-on-error: true
+      run: |
+        docker run sswconsulting/codeauditor --token ${{inputs.token}} --url ${{inputs.url}}
+    - name: "Check if new broken links/code errors/code warnings has come up"
+      shell: bash
+      run: |
+        curl \
+            -X POST 'https://asia-east2-sswlinkauditor-c1131.cloudfunctions.net/api/comparescanlatestandsecond/${{inputs.token}}' \
+            -H 'Content-Type: application/json' \
+            -d '{"url": "${{inputs.url}}"}' \
+            -o content.json  
+    - name: output api content
+      shell: bash
+      id: content
+      # run: echo "name=id::$(cat content.json)" >> $GITHUB_OUTPUT
+      run: echo "::set-output name=id::$(cat content.json)"
+    - name: If number of Code Warnings increases
+      shell: bash
+      if: "${{fromJson(steps.content.outputs.id).isHtmlWarningsUp}}"
+      env:
+        GH_TOKEN: ${{inputs.GitHub_Token}}
+      run: |
+        echo "Create issue for increased code warnings"
+        gh issue \
+          create --title "⚠️ CodeAuditor Alert - Increased number of HTML Warnings detected" \
+          --body "
+          ## New HTML Warnings detected
+          
+          ⚠️ The number of HTML Warnings has gone up by **$((${{fromJson(steps.content.outputs.id).currHtmlWarnings}} - ${{fromJson(steps.content.outputs.id).prevHtmlWarnings}}))** from **${{fromJson(steps.content.outputs.id).prevHtmlWarnings}}** to **${{fromJson(steps.content.outputs.id).currHtmlWarnings}}**
+          
+          See [Latest Scan Details ](https://codeauditor.com/build/${{fromJson(steps.content.outputs.id).latestRunId}})
+            
+          - [ ] Please fix remaining HTML Warnings"
+    - name: If number of Code Errors increases
+      shell: bash
+      if: "${{fromJson(steps.content.outputs.id).isHtmlErrorsUp}}"
+      env:
+        GH_TOKEN: ${{inputs.GitHub_Token}}
+      run: |
+        echo "Create issue for increased code errors"
+        gh issue \
+          create --title "❌ CodeAuditor Alert - Increased number of HTML Errors detected" \
+          --body "
+          ## New HTML Errors detected
+          
+          ❌ The number of HTML Errors has gone up by **$((${{fromJson(steps.content.outputs.id).currHtmlErrors}} - ${{fromJson(steps.content.outputs.id).prevHtmlErrors}}))** from **${{fromJson(steps.content.outputs.id).prevHtmlErrors}}** to **${{fromJson(steps.content.outputs.id).currHtmlErrors}}**
+          
+          See [Latest Scan Details ](https://codeauditor.com/build/${{fromJson(steps.content.outputs.id).latestRunId}})
+            
+          - [ ] Please fix remaining HTML Errors"
+    - name: If number of Broken Links increases
+      shell: bash
+      if: "${{fromJson(steps.content.outputs.id).isBrokenLinksUp}}"
+      env:
+        GH_TOKEN: ${{inputs.GitHub_Token}}
+      run: |
+        echo "Create issue for increased broken links"
+        gh issue \
+          create --title "❗ CodeAuditor Alert - Increased number of Broken Links detected" \
+          --body "
+          ## New Broken Links detected
+          
+          ❗ The number of Broken Links has gone up by **$((${{fromJson(steps.content.outputs.id).currBrokenLinks}} - ${{fromJson(steps.content.outputs.id).prevBrokenLinks}}))** from **${{fromJson(steps.content.outputs.id).prevBrokenLinks}}** to **${{fromJson(steps.content.outputs.id).currBrokenLinks}}**
+          
+          See [Latest Scan Details ](https://codeauditor.com/build/${{fromJson(steps.content.outputs.id).latestRunId}})
+            
+          - [ ] Please fix remaining Broken Links"
+    - name: "Check latest scan summaries"
+      shell: bash
+      run: |
+        curl \
+            -X POST 'https://asia-east2-sswlinkauditor-c1131.cloudfunctions.net/api/latest/${{inputs.token}}' \
+            -H 'Content-Type: application/json' \
+            -d '{"url": "${{inputs.url}}"}' \
+            -o summaries.json  
+    - name: output summaries api
+      shell: bash
+      id: summaries
+      run: echo "::set-output name=id::$(cat summaries.json)"
+    - name: Job Summaries
+      shell: bash
+      run: |
+        echo "### Scan Summaries 🚀" >> $GITHUB_STEP_SUMMARY
+
+        echo "See [Scan Details](https://codeauditor.com/build/${{fromJson(steps.summaries.outputs.id).summary[0].runId}})" >> $GITHUB_STEP_SUMMARY
+
+        echo "|                             | Values                                                              |" >> $GITHUB_STEP_SUMMARY
+        echo "| --------------------------- | ------------------------------------------------------------------- |" >> $GITHUB_STEP_SUMMARY
+        echo "|   **Url**                   | ${{fromJson(steps.summaries.outputs.id).summary[0].url}}            |" >> $GITHUB_STEP_SUMMARY
+        echo "|   **Timestamp**             | ${{fromJson(steps.summaries.outputs.id).summary[0].timestamp}}      |" >> $GITHUB_STEP_SUMMARY
+        echo "|   **Total Links Scanned**   | ${{fromJson(steps.summaries.outputs.id).summary[0].totalScanned}}   |" >> $GITHUB_STEP_SUMMARY
+        echo "|   **Broken Links**          | ${{fromJson(steps.summaries.outputs.id).summary[0].totalUnique404}} |" >> $GITHUB_STEP_SUMMARY
+        echo "|   **HTML Errors**           | ${{fromJson(steps.summaries.outputs.id).summary[0].htmlErrors}}     |" >> $GITHUB_STEP_SUMMARY
+        echo "|   **HTML Warnings**         | ${{fromJson(steps.summaries.outputs.id).summary[0].htmlWarnings}}   |" >> $GITHUB_STEP_SUMMARY

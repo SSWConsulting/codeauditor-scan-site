@@ -61,6 +61,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: CodeAuditor Feedback Loop Workflow
         uses: tombui99/codeauditor-github-workflow@v1.0.0
         with:

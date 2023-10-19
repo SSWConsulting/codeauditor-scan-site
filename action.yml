@@ -23,11 +23,11 @@ runs:
       shell: bash
       run: |
         inputs=($INPUTS)
-    - name: "SSW CodeAuditor - Check broken links and performance"
-      shell: bash
-      continue-on-error: true
-      run: |
-        docker run sswconsulting/codeauditor --token ${{inputs.token}} --url ${{inputs.url}}
+    # - name: "SSW CodeAuditor - Check broken links and performance"
+    #   shell: bash
+    #   continue-on-error: true
+    #   run: |
+    #     docker run sswconsulting/codeauditor --token ${{inputs.token}} --url ${{inputs.url}}
     - name: "Check if new broken links/code errors/code warnings has come up"
       shell: bash
       run: |
@@ -109,7 +109,24 @@ runs:
       run: |
         echo "### Scan Summaries 🚀" >> $GITHUB_STEP_SUMMARY
 
-        echo "See [Scan Details](https://codeauditor.com/build/${{fromJson(steps.summaries.outputs.id).summary[0].runId}})" >> $GITHUB_STEP_SUMMARY
+        echo "See [All Scan Details](https://codeauditor.com/build/${{fromJson(steps.summaries.outputs.id).summary[0].runId}})" >> $GITHUB_STEP_SUMMARY
+
+        if [ ${{fromJson(steps.content.outputs.contentOut).isHtmlWarningsUp}} ]
+        then
+          echo "⚠️ The number of HTML Warnings has gone up by **$((${{fromJson(steps.content.outputs.id).currHtmlWarnings}} - ${{fromJson(steps.content.outputs.id).prevHtmlWarnings}}))** from **${{fromJson(steps.content.outputs.id).prevHtmlWarnings}}** to **${{fromJson(steps.content.outputs.id).currHtmlWarnings}}**"
+        fi
+
+        if [ ${{fromJson(steps.content.outputs.contentOut).isHtmlErrorsUp}} ]
+        then
+          echo "❌ The number of HTML Errors has gone up by **$((${{fromJson(steps.content.outputs.id).currHtmlErrors}} - ${{fromJson(steps.content.outputs.id).prevHtmlErrors}}))** from **${{fromJson(steps.content.outputs.id).prevHtmlErrors}}** to **${{fromJson(steps.content.outputs.id).currHtmlErrors}}**"
+        fi
+
+        if [ ${{fromJson(steps.content.outputs.contentOut).isBrokenLinksUp}} ]
+        then
+          echo "❗ The number of Broken Links has gone up by **$((${{fromJson(steps.content.outputs.id).currBrokenLinks}} - ${{fromJson(steps.content.outputs.id).prevBrokenLinks}}))** from **${{fromJson(steps.content.outputs.id).prevBrokenLinks}}** to **${{fromJson(steps.content.outputs.id).currBrokenLinks}}**"
+        fi
+
+        ## Scan Details Summary
 
         echo "|                             | Values                                                              |" >> $GITHUB_STEP_SUMMARY
         echo "| --------------------------- | ------------------------------------------------------------------- |" >> $GITHUB_STEP_SUMMARY

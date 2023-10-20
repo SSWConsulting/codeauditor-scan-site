@@ -23,11 +23,11 @@ runs:
       shell: bash
       run: |
         inputs=($INPUTS)
-    # - name: "SSW CodeAuditor - Check broken links and performance"
-    #   shell: bash
-    #   continue-on-error: true
-    #   run: |
-    #     docker run sswconsulting/codeauditor --token ${{inputs.token}} --url ${{inputs.url}}
+    - name: "SSW CodeAuditor - Check broken links and performance"
+      shell: bash
+      continue-on-error: true
+      run: |
+        docker run sswconsulting/codeauditor --token ${{inputs.token}} --url ${{inputs.url}}
     - name: "Check if new broken links/code errors/code warnings has come up"
       shell: bash
       run: |

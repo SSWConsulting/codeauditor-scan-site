@@ -110,17 +110,17 @@ runs:
 
         echo "See [All Scan Details](https://codeauditor.com/build/${{fromJson(steps.summaries.outputs.summariesOut).summary[0].runId}})" >> $GITHUB_STEP_SUMMARY
 
-        if [ ${{fromJson(steps.content.outputs.contentOut).isHtmlWarningsUp}} ]
+        if ${{fromJson(steps.content.outputs.contentOut).isHtmlWarningsUp}}
         then
           echo "⚠️ The number of HTML Warnings has gone up by $((${{fromJson(steps.content.outputs.contentOut).currHtmlWarnings}} - ${{fromJson(steps.content.outputs.contentOut).prevHtmlWarnings}})) from ${{fromJson(steps.content.outputs.contentOut).prevHtmlWarnings}} to ${{fromJson(steps.content.outputs.contentOut).currHtmlWarnings}}" >> $GITHUB_STEP_SUMMARY
         fi
 
-        if [ ${{fromJson(steps.content.outputs.contentOut).isHtmlErrorsUp}} ]
+        if ${{fromJson(steps.content.outputs.contentOut).isHtmlErrorsUp}}
         then
           echo "❌ The number of HTML Errors has gone up by **$((${{fromJson(steps.content.outputs.contentOut).currHtmlErrors}} - ${{fromJson(steps.content.outputs.contentOut).prevHtmlErrors}}))** from **${{fromJson(steps.content.outputs.contentOut).prevHtmlErrors}}** to **${{fromJson(steps.content.outputs.contentOut).currHtmlErrors}}**" >> $GITHUB_STEP_SUMMARY
         fi
 
-        if [ ${{fromJson(steps.content.outputs.contentOut).isBrokenLinksUp}} ]
+        if ${{fromJson(steps.content.outputs.contentOut).isBrokenLinksUp}}
         then
           echo "❗ The number of Broken Links has gone up by **$((${{fromJson(steps.content.outputs.contentOut).currBrokenLinks}} - ${{fromJson(steps.content.outputs.contentOut).prevBrokenLinks}}))** from **${{fromJson(steps.content.outputs.contentOut).prevBrokenLinks}}** to **${{fromJson(steps.content.outputs.contentOut).currBrokenLinks}}**" >> $GITHUB_STEP_SUMMARY
         fi

@@ -16,4 +16,4 @@ jobs:
           # Your Scan URL
           url: ${{ vars.SCANURL }}
           # Your GitHub Token
-          GitHub_Token: ${{secrets.GH_TOKEN}}
+          GitHub_Token: ${{ github.token }}

@@ -36,7 +36,8 @@ This workflow action runs CodeAuditor scan on your website and creates new GitHu
 
 | name         | required | type  | description |
 | ------------ | ---      | ------ | ----------- |
-| GitHub_Token        | yes      | string | Your GitHub personal access token used to fetch data. Pass a secret by for instance using `${{ secrets.GH_TOKEN }}`. [Go here](https://github.com/settings/tokens/new?scopes=read:user) to generate one
+| GitHub_Token        | yes      | string | Your repo default GitHub token i.e. using `${{ github.token }}` 
+| | | | Make sure you grant the token permission to create issue
 | token     | yes      | string | Your personal CodeAuditor token that can be found on CodeAuditor's How It Works page
 | url       | yes      | string | The url used on your CodeAuditor scan
 
@@ -60,15 +61,17 @@ name: Test CodeAuditor Workflow
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions: 
+      issues: write
     steps:
       - uses: actions/checkout@v3
       - name: CodeAuditor Feedback Loop Workflow
         uses: tombui99/codeauditor-github-workflow@v1.0.0
         with:
           # Your CodeAuditor token
-          token: ${{ vars.CODEAUDITORTOKEN }}
+          token: ${{ secrets.CODEAUDITORTOKEN }}
           # Your Scan URL
           url: ${{ vars.SCANURL }}
           # Your GitHub Token
-          GitHub_Token: ${{secrets.GH_TOKEN}}
+          GitHub_Token: ${{ github.token }}
 ```

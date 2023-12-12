@@ -37,7 +37,7 @@ This workflow action runs CodeAuditor scan on your website and creates new GitHu
 | name         | required | type  | description |
 | ------------ | ---      | ------ | ----------- |
 | GitHub_Token        | yes      | string | Your repo default GitHub token i.e. using `${{ github.token }}` 
-| | | | Make sure you grant the token permission to create issue
+| | | | Make sure you grant the [token permission](https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs) to create issue
 | token     | yes      | string | Your personal CodeAuditor token that can be found on CodeAuditor's How It Works page
 | url       | yes      | string | The url used on your CodeAuditor scan
 
@@ -48,6 +48,14 @@ Upon completion of the workflow, user will be able to view a the scan summary as
 <img width="434" alt="image" src="https://github.com/tombui99/codeauditor-github-workflow/assets/67776356/bbf76296-7b0e-4c78-90f5-3947d8ee8994">
 
 **Figure: CodeAuditor Workflow Job Summaries**
+
+## Creating Task Items
+
+Upon completion of the workflow, if CodeAuditor finds new broken links or code warnings/errors, it will create a new issue with a report and a task item to fix.
+
+<img width="1297" alt="image" src="https://github.com/SSWConsulting/codeauditor-scan-site/assets/67776356/ee3b96ad-f4fd-4bc7-bcfe-af6b865e2c35">
+
+**Figure: Sample generated issues**
 
 ## Example usage
 

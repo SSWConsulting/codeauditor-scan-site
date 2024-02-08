@@ -14,7 +14,7 @@ jobs:
         uses: SSWConsulting/codeauditor-scan-site@test
         with:
           # Your CodeAuditor token
-          token: ${{ secrets.CODEAUDITORTOKEN }}
+          token: 3ec72ff0-50d0-4e99-b9d6-1f4dcda496fa
           # Your Scan URL
           url: "https://htmlhint.com/"
           # Your GitHub Token

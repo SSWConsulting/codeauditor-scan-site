@@ -104,37 +104,13 @@ runs:
       env:
         GH_TOKEN: ${{inputs.GitHub_Token}}
       run: |
-        if ${{ fromJson(steps.content.outputs.contentOut).isHtmlWarningsUp }}; then
+        if ${{ fromJson(steps.content.outputs.contentOut).isHtmlWarningsUp || fromJson(steps.content.outputs.contentOut).isHtmlErrorsUp || fromJson(steps.content.outputs.contentOut).isBrokenLinksUp }}; then
           gh issue create --title "❗️ CodeAuditor Alert - Increased errors detected" --body "
-          ## New HTML Warnings detected
-          
-          ⚠️ The number of HTML Warnings has gone up by **$((${{fromJson(steps.content.outputs.contentOut).currHtmlWarnings}} - ${{fromJson(steps.content.outputs.contentOut).prevHtmlWarnings}}))** from **${{fromJson(steps.content.outputs.contentOut).prevHtmlWarnings}}** to **${{fromJson(steps.content.outputs.contentOut).currHtmlWarnings}}**
+          ## New Errors detected
           
           See [Latest Scan Details ](https://codeauditor.com/build/${{fromJson(steps.content.outputs.contentOut).latestRunId}})
           
-          - [ ] Please fix remaining HTML Warnings"
-        fi
-
-        if ${{ fromJson(steps.content.outputs.contentOut).isHtmlErrorsUp }}; then
-          gh issue create --title "❗️ CodeAuditor Alert - Increased errors detected" --body "
-          ## New HTML Errors detected
-          
-          ❌ The number of HTML Errors has gone up by **$((${{fromJson(steps.content.outputs.contentOut).currHtmlErrors}} - ${{fromJson(steps.content.outputs.contentOut).prevHtmlErrors}}))** from **${{fromJson(steps.content.outputs.contentOut).prevHtmlErrors}}** to **${{fromJson(steps.content.outputs.contentOut).currHtmlErrors}}**
-          
-          See [Latest Scan Details ](https://codeauditor.com/build/${{fromJson(steps.content.outputs.contentOut).latestRunId}})
-          
-          - [ ] Please fix remaining HTML Errors"
-        fi
-
-        if ${{ fromJson(steps.content.outputs.contentOut).isBrokenLinksUp }}; then
-          gh issue create --title "❗️ CodeAuditor Alert - Increased errors detected" --body "
-          ## New Broken Links detected
-          
-          ❗ The number of Broken Links has gone up by **$((${{fromJson(steps.content.outputs.contentOut).currBrokenLinks}} - ${{fromJson(steps.content.outputs.contentOut).prevBrokenLinks}}))** from **${{fromJson(steps.content.outputs.contentOut).prevBrokenLinks}}** to **${{fromJson(steps.content.outputs.contentOut).currBrokenLinks}}**
-          
-          See [Latest Scan Details ](https://codeauditor.com/build/${{fromJson(steps.content.outputs.contentOut).latestRunId}})
-          
-          - [ ] Please fix remaining Broken Links"
+          - [ ] Please fix remaining Errors"
         fi
     - name: "Check latest scan summaries"
       shell: bash

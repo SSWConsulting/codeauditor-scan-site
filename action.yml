@@ -35,11 +35,11 @@ runs:
     #     docker run sswconsulting/codeauditor --token ${{inputs.token}} --url ${{inputs.url}}
     - name: "Check if new broken links/code errors/code warnings has come up"
       shell: bash
-      run: | # TODO: Repace hardcoded value with ${{inputs.token}} and ${{inputs.url}}
+      run: |
         curl \
-            -X POST 'https://asia-east2-sswlinkauditor-c1131.cloudfunctions.net/api/comparescanlatestandsecond/3ec72ff0-50d0-4e99-b9d6-1f4dcda496fa' \
+            -X POST 'https://asia-east2-sswlinkauditor-c1131.cloudfunctions.net/api/comparescanlatestandsecond/${{inputs.token}}' \
             -H 'Content-Type: application/json' \
-            -d '{"url": "https://htmlhint.com/"}' \
+            -d '{"url": "${{inputs.url}}"}' \
             -o content.json  
     - name: output api content
       shell: bash

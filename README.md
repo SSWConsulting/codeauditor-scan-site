@@ -40,6 +40,7 @@ This workflow action runs CodeAuditor scan on your website and creates new GitHu
 | | | | Make sure you grant the [token permission](https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs) to create issue
 | token     | yes      | string | Your personal CodeAuditor token that can be found on CodeAuditor's How It Works page
 | url       | yes      | string | The url used on your CodeAuditor scan
+| AlertIssue       | no      | boolean | Set to "true" if you want to switch on issue alert feature
 
 ## Job Summaries
 

@@ -47,7 +47,7 @@ runs:
       run: echo "contentOut=$(cat content.json)" >> $GITHUB_OUTPUT
     - name: If number of Code Warnings increases
       shell: bash
-      if: ${{inputs.AlertIssue}} && ${{fromJson(steps.content.outputs.contentOut).isHtmlWarningsUp}}
+      if: ${{inputs.AlertIssue == 'true' && fromJson(steps.content.outputs.contentOut).isHtmlWarningsUp}}
       env:
         GH_TOKEN: ${{inputs.GitHub_Token}}
       run: |
@@ -64,7 +64,7 @@ runs:
           - [ ] Please fix remaining HTML Warnings"
     - name: If number of Code Errors increases
       shell: bash
-      if: ${{inputs.AlertIssue}} && ${{fromJson(steps.content.outputs.contentOut).isHtmlErrorsUp}}
+      if: ${{inputs.AlertIssue == 'true' && fromJson(steps.content.outputs.contentOut).isHtmlErrorsUp}}
       env:
         GH_TOKEN: ${{inputs.GitHub_Token}}
       run: |
@@ -81,7 +81,7 @@ runs:
           - [ ] Please fix remaining HTML Errors"
     - name: If number of Broken Links increases
       shell: bash
-      if: ${{inputs.AlertIssue}} && ${{fromJson(steps.content.outputs.contentOut).isBrokenLinksUp}}
+      if: ${{inputs.AlertIssue == 'true' && fromJson(steps.content.outputs.contentOut).isBrokenLinksUp}}
       env:
         GH_TOKEN: ${{inputs.GitHub_Token}}
       run: |

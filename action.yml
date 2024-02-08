@@ -106,11 +106,11 @@ runs:
       run: |
         if ${{ fromJson(steps.content.outputs.contentOut).isHtmlWarningsUp || fromJson(steps.content.outputs.contentOut).isHtmlErrorsUp || fromJson(steps.content.outputs.contentOut).isBrokenLinksUp }}; then
           gh issue create --title "❗️ CodeAuditor Alert - Increased errors detected" --body "
-          ## New Errors detected
+          ## New Errors Detected
           
           See [Latest Scan Details ](https://codeauditor.com/build/${{fromJson(steps.content.outputs.contentOut).latestRunId}})
           
-          - [ ] Please fix remaining Errors"
+          - [ ] Please fix"
         fi
     - name: "Check latest scan summaries"
       shell: bash

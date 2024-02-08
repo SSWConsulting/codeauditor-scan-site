@@ -58,14 +58,16 @@ runs:
           echo "Existing open issue found with number $ISSUE_NUMBER"
           echo issue_number=$ISSUE_NUMBER >> $GITHUB_OUTPUT
         fi
-    - name: Generate comments
+    - name: Comment on existing issue
       shell: bash
-      id: issue_comment
+      id: comment_or_create
+      if: ${{inputs.AlertIssue == 'true' && steps.check_issue.outputs.issue_number}}
       env:
         GH_TOKEN: ${{inputs.GitHub_Token}}
       run: |
         if ${{ fromJson(steps.content.outputs.contentOut).isHtmlWarningsUp }}; then
-          COMMENT_BODY="## New HTML Warnings detected
+          gh issue comment ${{ steps.check_issue.outputs.issue_number }} --body "
+          ## New HTML Warnings detected
           
           ⚠️ The number of HTML Warnings has gone up by **$((${{fromJson(steps.content.outputs.contentOut).currHtmlWarnings}} - ${{fromJson(steps.content.outputs.contentOut).prevHtmlWarnings}}))** from **${{fromJson(steps.content.outputs.contentOut).prevHtmlWarnings}}** to **${{fromJson(steps.content.outputs.contentOut).currHtmlWarnings}}**
           
@@ -75,7 +77,8 @@ runs:
         fi
 
         if ${{ fromJson(steps.content.outputs.contentOut).isHtmlErrorsUp }}; then
-          COMMENT_BODY="## New HTML Errors detected
+          gh issue comment ${{ steps.check_issue.outputs.issue_number }} --body "
+          ## New HTML Errors detected
           
           ❌ The number of HTML Errors has gone up by **$((${{fromJson(steps.content.outputs.contentOut).currHtmlErrors}} - ${{fromJson(steps.content.outputs.contentOut).prevHtmlErrors}}))** from **${{fromJson(steps.content.outputs.contentOut).prevHtmlErrors}}** to **${{fromJson(steps.content.outputs.contentOut).currHtmlErrors}}**
           
@@ -85,7 +88,8 @@ runs:
         fi
 
         if ${{ fromJson(steps.content.outputs.contentOut).isBrokenLinksUp }}; then
-          COMMENT_BODY="## New Broken Links detected
+          gh issue comment ${{ steps.check_issue.outputs.issue_number }} --body "
+          ## New Broken Links detected
           
           ❗ The number of Broken Links has gone up by **$((${{fromJson(steps.content.outputs.contentOut).currBrokenLinks}} - ${{fromJson(steps.content.outputs.contentOut).prevBrokenLinks}}))** from **${{fromJson(steps.content.outputs.contentOut).prevBrokenLinks}}** to **${{fromJson(steps.content.outputs.contentOut).currBrokenLinks}}**
           
@@ -93,16 +97,6 @@ runs:
           
           - [ ] Please fix remaining Broken Links"
         fi
-
-        echo comment_body=$COMMENT_BODY >> $GITHUB_OUTPUT
-    - name: Comment on existing issue or create new one
-      shell: bash
-      id: comment_or_create
-      if: ${{inputs.AlertIssue == 'true' && steps.check_issue.outputs.issue_number}}
-      env:
-        GH_TOKEN: ${{inputs.GitHub_Token}}
-      run: |
-        gh issue comment ${{ steps.check_issue.outputs.issue_number }} --body "${{steps.issue_comment.outputs.comment_body}}"
     - name: Create new issue if no existing open issue
       shell: bash
       id: create_issue
@@ -110,7 +104,38 @@ runs:
       env:
         GH_TOKEN: ${{inputs.GitHub_Token}}
       run: |
-        gh issue create --title "❗️ CodeAuditor Alert - Increased errors detected" --body "${{steps.issue_comment.outputs.comment_body}}"
+        if ${{ fromJson(steps.content.outputs.contentOut).isHtmlWarningsUp }}; then
+          gh issue create --title "❗️ CodeAuditor Alert - Increased errors detected" --body "
+          ## New HTML Warnings detected
+          
+          ⚠️ The number of HTML Warnings has gone up by **$((${{fromJson(steps.content.outputs.contentOut).currHtmlWarnings}} - ${{fromJson(steps.content.outputs.contentOut).prevHtmlWarnings}}))** from **${{fromJson(steps.content.outputs.contentOut).prevHtmlWarnings}}** to **${{fromJson(steps.content.outputs.contentOut).currHtmlWarnings}}**
+          
+          See [Latest Scan Details ](https://codeauditor.com/build/${{fromJson(steps.content.outputs.contentOut).latestRunId}})
+          
+          - [ ] Please fix remaining HTML Warnings"
+        fi
+
+        if ${{ fromJson(steps.content.outputs.contentOut).isHtmlErrorsUp }}; then
+          gh issue create --title "❗️ CodeAuditor Alert - Increased errors detected" --body "
+          ## New HTML Errors detected
+          
+          ❌ The number of HTML Errors has gone up by **$((${{fromJson(steps.content.outputs.contentOut).currHtmlErrors}} - ${{fromJson(steps.content.outputs.contentOut).prevHtmlErrors}}))** from **${{fromJson(steps.content.outputs.contentOut).prevHtmlErrors}}** to **${{fromJson(steps.content.outputs.contentOut).currHtmlErrors}}**
+          
+          See [Latest Scan Details ](https://codeauditor.com/build/${{fromJson(steps.content.outputs.contentOut).latestRunId}})
+          
+          - [ ] Please fix remaining HTML Errors"
+        fi
+
+        if ${{ fromJson(steps.content.outputs.contentOut).isBrokenLinksUp }}; then
+          gh issue create --title "❗️ CodeAuditor Alert - Increased errors detected" --body "
+          ## New Broken Links detected
+          
+          ❗ The number of Broken Links has gone up by **$((${{fromJson(steps.content.outputs.contentOut).currBrokenLinks}} - ${{fromJson(steps.content.outputs.contentOut).prevBrokenLinks}}))** from **${{fromJson(steps.content.outputs.contentOut).prevBrokenLinks}}** to **${{fromJson(steps.content.outputs.contentOut).currBrokenLinks}}**
+          
+          See [Latest Scan Details ](https://codeauditor.com/build/${{fromJson(steps.content.outputs.contentOut).latestRunId}})
+          
+          - [ ] Please fix remaining Broken Links"
+        fi
     - name: "Check latest scan summaries"
       shell: bash
       run: |

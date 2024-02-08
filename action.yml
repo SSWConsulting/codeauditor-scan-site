@@ -65,33 +65,33 @@ runs:
         GH_TOKEN: ${{inputs.GitHub_Token}}
       run: |
         if ${{ fromJson(steps.content.outputs.contentOut).isHtmlWarningsUp }}; then
-          COMMENT_BODY='## New HTML Warnings detected
+          COMMENT_BODY="## New HTML Warnings detected
           
           ⚠️ The number of HTML Warnings has gone up by **$((${{fromJson(steps.content.outputs.contentOut).currHtmlWarnings}} - ${{fromJson(steps.content.outputs.contentOut).prevHtmlWarnings}}))** from **${{fromJson(steps.content.outputs.contentOut).prevHtmlWarnings}}** to **${{fromJson(steps.content.outputs.contentOut).currHtmlWarnings}}**
           
           See [Latest Scan Details ](https://codeauditor.com/build/${{fromJson(steps.content.outputs.contentOut).latestRunId}})
           
-          - [ ] Please fix remaining HTML Warnings'
+          - [ ] Please fix remaining HTML Warnings"
         fi
 
         if ${{ fromJson(steps.content.outputs.contentOut).isHtmlErrorsUp }}; then
-          COMMENT_BODY=''## New HTML Errors detected
+          COMMENT_BODY="## New HTML Errors detected
           
           ❌ The number of HTML Errors has gone up by **$((${{fromJson(steps.content.outputs.contentOut).currHtmlErrors}} - ${{fromJson(steps.content.outputs.contentOut).prevHtmlErrors}}))** from **${{fromJson(steps.content.outputs.contentOut).prevHtmlErrors}}** to **${{fromJson(steps.content.outputs.contentOut).currHtmlErrors}}**
           
           See [Latest Scan Details ](https://codeauditor.com/build/${{fromJson(steps.content.outputs.contentOut).latestRunId}})
           
-          - [ ] Please fix remaining HTML Errors'
+          - [ ] Please fix remaining HTML Errors"
         fi
 
         if ${{ fromJson(steps.content.outputs.contentOut).isBrokenLinksUp }}; then
-          COMMENT_BODY='## New Broken Links detected
+          COMMENT_BODY="## New Broken Links detected
           
           ❗ The number of Broken Links has gone up by **$((${{fromJson(steps.content.outputs.contentOut).currBrokenLinks}} - ${{fromJson(steps.content.outputs.contentOut).prevBrokenLinks}}))** from **${{fromJson(steps.content.outputs.contentOut).prevBrokenLinks}}** to **${{fromJson(steps.content.outputs.contentOut).currBrokenLinks}}**
           
           See [Latest Scan Details ](https://codeauditor.com/build/${{fromJson(steps.content.outputs.contentOut).latestRunId}})
           
-          - [ ] Please fix remaining Broken Links'
+          - [ ] Please fix remaining Broken Links"
         fi
 
         echo comment_body=$COMMENT_BODY >> $GITHUB_OUTPUT

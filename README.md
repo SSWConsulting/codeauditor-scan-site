@@ -41,6 +41,7 @@ This workflow action runs CodeAuditor scan on your website and creates new GitHu
 | token     | yes      | string | Your personal CodeAuditor token that can be found on CodeAuditor's How It Works page
 | url       | yes      | string | The url used on your CodeAuditor scan
 | AlertIssue       | no      | boolean | Set to "true" if you want to switch on issue alert feature
+| GoMaxthread       | no      | number | Set the maximum number of threads for Golang web scraping (Default is 100)
 
 ## Job Summaries
 

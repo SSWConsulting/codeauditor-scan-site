@@ -19,6 +19,10 @@ inputs:
     description: 'Switch on/off auto-generated alert issue'
     required: false
     default: true
+  GoMaxthread:
+    description: 'Set maximum number of threads for Link Scanning (Default to 100)'
+    required: false
+    default: 100
 
 runs:
   using: "composite"
@@ -30,7 +34,7 @@ runs:
     - name: "SSW CodeAuditor - Check broken links and performance"
       shell: bash
       run: |
-        docker run sswconsulting/codeauditor --token ${{inputs.token}} --url ${{inputs.url}}
+        docker run sswconsulting/codeauditor --token ${{inputs.token}} --url ${{inputs.url}} --maxthread {{inputs.GoMaxthread}}
     - name: "Check if new broken links/code errors/code warnings has come up"
       shell: bash
       run: |

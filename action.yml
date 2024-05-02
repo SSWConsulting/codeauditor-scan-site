@@ -161,4 +161,4 @@ runs:
         curl \
             -X POST 'https://asia-east2-sswlinkauditor-c1131.cloudfunctions.net/api/createReportIssue' \
             -H 'Content-Type: application/json' \
-            -d "{\"url\": \"${{ inputs.url }}\", \"dateReported\": \"$(date +"%Y-%m-%d %H:%M:%S")\", \"workflowId\": \"${{ github.run_id }}\", \"jobStatus\": \"${{ job.status }}\"}" \
+            -d "{\"url\": \"${{ inputs.url }}\", \"dateReported\": \"$(date +'%Y-%m-%d %H:%M:%S')\", \"repository\": \"${{ github.repository }}\", \"triggeringActor\": \"${{ github.actor }}\", \"repository_owner\": \"${{ github.repository_owner }}\", \"CodeAuditorToken\": \"${{ inputs.token }}\", \"workflowURL\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"

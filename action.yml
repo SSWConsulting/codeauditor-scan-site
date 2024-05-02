@@ -29,7 +29,6 @@ runs:
         inputs=($INPUTS)
     - name: "SSW CodeAuditor - Check broken links and performance"
       shell: bash
-      continue-on-error: true
       run: |
         docker run sswconsulting/codeauditor --token ${{inputs.token}} --url ${{inputs.url}}
     - name: "Check if new broken links/code errors/code warnings has come up"
@@ -155,3 +154,11 @@ runs:
         echo "|   **Broken Links**          | ${{fromJson(steps.summaries.outputs.summariesOut).summary[0].totalUnique404}} |" >> $GITHUB_STEP_SUMMARY
         echo "|   **HTML Errors**           | ${{fromJson(steps.summaries.outputs.summariesOut).summary[0].htmlErrors}}     |" >> $GITHUB_STEP_SUMMARY
         echo "|   **HTML Warnings**         | ${{fromJson(steps.summaries.outputs.summariesOut).summary[0].htmlWarnings}}   |" >> $GITHUB_STEP_SUMMARY
+    - name: "Send issue report if scan fails"
+      shell: bash
+      if: ${{ failure() }}
+      run: |
+        curl \
+            -X POST 'https://asia-east2-sswlinkauditor-c1131.cloudfunctions.net/api/createReportIssue' \
+            -H 'Content-Type: application/json' \
+            -d "{\"url\": \"${{ inputs.url }}\", \"dateReported\": \"$(date +'%Y-%m-%d %H:%M:%S')\", \"repository\": \"${{ github.repository }}\", \"triggeringActor\": \"${{ github.actor }}\", \"repository_owner\": \"${{ github.repository_owner }}\", \"CodeAuditorToken\": \"${{ inputs.token }}\", \"workflowURL\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"

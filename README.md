@@ -24,6 +24,10 @@ CodeAuditor looks at the HTML browsers see, not the code developers write
 Only works on static sites, not Angular SPA, React SPA or Blazor
 To make it clear, this is not completely fixable, but we could improve it to make it less painful.
 
+### Managing errors
+
+Managing errors becomes simple with Code Auditor. Check out this Rule on how to manage [errors with Code Auditor](https://www.ssw.com.au/rules/managing-errors-with-code-auditor/).
+
 ### Prerequisites 
 
 Make sure your website is deployed as CodeAuditor only scans what the HTML browsers see not the code developers write

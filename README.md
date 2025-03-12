@@ -80,7 +80,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: CodeAuditor Feedback Loop Workflow
-        uses: tombui99/codeauditor-github-workflow@v1.0.0
+        uses: SSWConsulting/codeauditor-github-workflow@v1.0.0
         with:
           # Your CodeAuditor token
           token: ${{ secrets.CODEAUDITORTOKEN }}
